@@ -8,14 +8,13 @@ public class TimeAgent : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange( new string[] 
-		{
+		PublicDependencyModuleNames.AddRange([
 			"Core", 
 			"CoreUObject",
 			"Engine", 
 			"InputCore", 
-			"EnhancedInput",
-		});
+			"EnhancedInput"
+		]);
 
 
 		// Uncomment if you are using Slate UI
