@@ -3,6 +3,8 @@
 
 #include "TimeAgentGameModeBase.h"
 
+#include "SlowMotionComponent.h"
+#include "TimeAgentPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -16,10 +18,19 @@ void ATimeAgentGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsInSlowMotion())
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), SlowMotionTimeScale);
-	else
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+	Player = Cast<ATimeAgentPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
+	if (!Player)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Player is null"));
+		return;
+	}
+	
+	PlayerSlowMotion = Cast<USlowMotionComponent>(Player->GetComponentByClass(USlowMotionComponent::StaticClass()));
+	if (!PlayerSlowMotion)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerSlowMotionComponent is null"));
+		return;
+	}
 	
 }
 
@@ -27,21 +38,31 @@ void ATimeAgentGameModeBase::Tick(float elapsedSec)
 {
 	Super::Tick(elapsedSec);
 	
+	UE_LOG(LogTemp, Log, TEXT("SlowMotion %d"), bInSlowMotion);
 	
-	
+}
+
+bool ATimeAgentGameModeBase::IsInSlowMotion() const
+{
+	return PlayerSlowMotion->IsInSlowMotion();
 }
 
 void ATimeAgentGameModeBase::ToggleSlowdownTime()
 {
-	if (IsInSlowMotion())
-		Mode = TimeState::NoSlowMotion;		
-	else
-		Mode = TimeState::SlowMotion;		
-		
-	if (IsInSlowMotion())
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), SlowMotionTimeScale);
-	else
+	if (bInSlowMotion)
+	{
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+		
+		PlayerSlowMotion->StopSlowMotion();
+		bInSlowMotion = false;
+	}
+	else
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), SlowMotionTimeScale);
+		
+		PlayerSlowMotion->StartSlowMotion();
+		bInSlowMotion = true;;
+	}
 	
 }
 
@@ -58,27 +79,22 @@ void ATimeAgentGameModeBase::SetSlowTimeScale(float TimeScale)
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeScale);
 }
 
-void ATimeAgentGameModeBase::SpawnPlayer(const FVector3f& Position)
+void ATimeAgentGameModeBase::RespawnPlayer()
 {
-	Position;	
-	// UWorld::SpawnActor()
-	
 }
 
-void ATimeAgentGameModeBase::SpawnEnemy(const FVector3f& Position)
+
+void ATimeAgentGameModeBase::RespawnEnemies(int LevelNumber)
 {
-	Position;
+	LevelNumber;
 }
 
-bool ATimeAgentGameModeBase::IsInSlowMotion() const
+void ATimeAgentGameModeBase::EnableSlowMotion()
 {
-	// if (!Player)	
-	// 	return false;
-	
-	if (Mode == TimeState::NoSlowMotion)
-		return false;
-	
-	return true;
+	bInSlowMotion = true;
 }
 
-	
+void ATimeAgentGameModeBase::DisableSlowMotion()
+{
+	bInSlowMotion = false;
+}

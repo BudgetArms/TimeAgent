@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "TimeAgentGameModeBase.generated.h"
 
+class USlowMotionComponent;
 class ATimeAgentPlayer;
 /**
  * 
@@ -21,6 +22,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float elapsedSec) override;
 
+	bool IsInSlowMotion() const;	
+	
 	UFUNCTION(BlueprintCallable)
 	void ToggleSlowdownTime();
 
@@ -31,33 +34,27 @@ public:
 	void SetSlowTimeScale(float TimeScale);
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnPlayer(const FVector3f& Position);
+	void RespawnPlayer();
 	
 	UFUNCTION(BlueprintCallable)
-	void SpawnEnemy(const FVector3f& Position);
+	void RespawnEnemies(int LevelNumber);
 
+	void EnableSlowMotion();
+	void DisableSlowMotion();
+	
 	
 private:
 
-	enum class TimeState
-	{
-		NoSlowMotion,
-		StartSlowMotion,
-		SlowMotion,
-		EndSlowMotion,
-	};
-	
-
-	UFUNCTION(BlueprintCallable)
-	bool IsInSlowMotion() const;
-	
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true), EditAnywhere)
-	float SlowMotionTimeScale{ 0.02f };
+	float SlowMotionTimeScale{ 0.01f };
 
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	ATimeAgentPlayer* Player{ nullptr };
 	
-	TimeState Mode { TimeState::NoSlowMotion };
+	UPROPERTY()
+	USlowMotionComponent* PlayerSlowMotion{ nullptr };
+	
+	bool bInSlowMotion{ false };
 	
 };
 

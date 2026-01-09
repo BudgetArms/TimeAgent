@@ -11,7 +11,6 @@
 
 ATimeAgentPlayer::ATimeAgentPlayer()
 {
-	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(GetMesh(), FName("Mesh"));
 	Camera->SetRelativeLocation(FVector(0.0f, 17.0f, 170.0f));
@@ -30,6 +29,38 @@ ATimeAgentPlayer::ATimeAgentPlayer()
 	GetMesh()->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
 	
 }
+
+void ATimeAgentPlayer::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	
+	AddPostProcessingMaterial();
+}
+
+void ATimeAgentPlayer::TickActor(float DeltaTime, ELevelTick TickType, FActorTickFunction& ThisTickFunction)
+{
+	Super::TickActor(DeltaTime, TickType, ThisTickFunction);
+	
+	
+	// this is a fix, because CustomTimeDilation doesn't change movement physics, for some reason
+	// I tried everything, This Is The Way
+	// float UnscaledDelta = FApp::GetDeltaTime();
+	//  
+	// FVector DesiredMovement = GetLastMovementInputVector().GetClampedToMaxSize(1.0f) * GetCharacterMovement()->MaxWalkSpeed * UnscaledDelta;
+	// AddActorWorldOffset(DesiredMovement, true);
+	//
+}
+
+UMaterialInstanceDynamic* ATimeAgentPlayer::GetSlowMotionPostProcessMaterial() const
+{
+	return PostProcessMID;
+}
+
+void ATimeAgentPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 
 void ATimeAgentPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
@@ -99,3 +130,24 @@ void ATimeAgentPlayer::Look(const float Yaw, const float Pitch)
 	}
 }
 
+
+void ATimeAgentPlayer::AddPostProcessingMaterial()
+{
+	if (!PostProcessMI)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PostProcessMaterialInstance is not assigned"));
+		return;
+	}
+	
+	
+	PostProcessMID = UMaterialInstanceDynamic::Create(PostProcessMI, this);
+	
+	// this is soooo fucked :D
+	FWeightedBlendable WeightedBlendable;
+	
+	WeightedBlendable.Weight = 1.f;
+	WeightedBlendable.Object = PostProcessMID;
+	
+	Camera->PostProcessSettings.WeightedBlendables.Array.Add(WeightedBlendable);
+	
+}

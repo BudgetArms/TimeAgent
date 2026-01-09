@@ -18,13 +18,16 @@ class TIMEAGENT_API ATimeAgentPlayer : public ATimeAgentCharacter
 
 public:
 	ATimeAgentPlayer();
+
+	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void TickActor(float DeltaTime, ELevelTick TickType, FActorTickFunction& ThisTickFunction) override;
+	
+	UMaterialInstanceDynamic* GetSlowMotionPostProcessMaterial() const;
 	
 	
 protected:
 	
-	UPROPERTY(EditAnywhere, Category="Camera", meta=(AllowPrivateAccess=true))
-	UCameraComponent* Camera;
-	
+	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -43,10 +46,14 @@ protected:
 	
 	
 	void Move(const float Forward, const float Right);
-	
 	void Look(const float Yaw, const float Pitch);
 	
+	void AddPostProcessingMaterial();
+
 	
+	UPROPERTY(EditAnywhere, Category="Camera", meta=(AllowPrivateAccess=true))
+	UCameraComponent* Camera;
+
 	UPROPERTY(EditAnywhere, Category="Input", meta=(AllowPrivateAccess=true))
 	UInputAction* MoveAction;
 		
@@ -59,5 +66,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input", meta=(AllowPrivateAccess=true))
 	UInputAction* ShootAction;
 		
+	
+	
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	UMaterialInstance* PostProcessMI;
+		
+	UMaterialInstanceDynamic* PostProcessMID;
+	
+	
 	
 };
