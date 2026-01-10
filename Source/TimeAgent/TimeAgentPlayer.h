@@ -20,14 +20,11 @@ public:
 	ATimeAgentPlayer();
 
 	virtual void OnConstruction(const FTransform& Transform) override;
-	virtual void TickActor(float DeltaTime, ELevelTick TickType, FActorTickFunction& ThisTickFunction) override;
 	
 	UMaterialInstanceDynamic* GetSlowMotionPostProcessMaterial() const;
 	
 	
 protected:
-	
-	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

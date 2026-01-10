@@ -16,13 +16,15 @@ ATimeAgentPlayer::ATimeAgentPlayer()
 	Camera->SetRelativeLocation(FVector(0.0f, 17.0f, 170.0f));
 	Camera->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
 	
-	UCapsuleComponent* Capsule = ACharacter::GetCapsuleComponent();
-	Capsule->SetCapsuleRadius(20);
-	
-	
 	Camera->bUsePawnControlRotation = true;
 	Camera->bEnableFirstPersonFieldOfView = true;
 	Camera->bEnableFirstPersonScale = true;
+	
+	
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	Capsule->SetCapsuleRadius(20);
+	
+		
 		
 	// Set First person type's to capsule/mesh, so the camera doesn't pick up the player
 	Capsule->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
@@ -37,30 +39,10 @@ void ATimeAgentPlayer::OnConstruction(const FTransform& Transform)
 	AddPostProcessingMaterial();
 }
 
-void ATimeAgentPlayer::TickActor(float DeltaTime, ELevelTick TickType, FActorTickFunction& ThisTickFunction)
-{
-	Super::TickActor(DeltaTime, TickType, ThisTickFunction);
-	
-	
-	// this is a fix, because CustomTimeDilation doesn't change movement physics, for some reason
-	// I tried everything, This Is The Way
-	// float UnscaledDelta = FApp::GetDeltaTime();
-	//  
-	// FVector DesiredMovement = GetLastMovementInputVector().GetClampedToMaxSize(1.0f) * GetCharacterMovement()->MaxWalkSpeed * UnscaledDelta;
-	// AddActorWorldOffset(DesiredMovement, true);
-	//
-}
-
 UMaterialInstanceDynamic* ATimeAgentPlayer::GetSlowMotionPostProcessMaterial() const
 {
 	return PostProcessMID;
 }
-
-void ATimeAgentPlayer::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 
 void ATimeAgentPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
@@ -86,7 +68,7 @@ void ATimeAgentPlayer::MoveInput(const FInputActionValue& Value)
 void ATimeAgentPlayer::LookInput(const FInputActionValue& Value)
 {
 	// Get look vector
-	FVector2D LookInput = Value.Get<FVector2D>();
+	const FVector2D LookInput = Value.Get<FVector2D>();
 	
 	// Apply move force
 	if (LookInput.IsNearlyZero())
@@ -95,7 +77,6 @@ void ATimeAgentPlayer::LookInput(const FInputActionValue& Value)
 	}
 	
 	Look(LookInput.X, LookInput.Y);
-	
 }
 
 void ATimeAgentPlayer::JumpStart(const FInputActionValue& Value)
@@ -140,9 +121,9 @@ void ATimeAgentPlayer::AddPostProcessingMaterial()
 	}
 	
 	
+	// Create the dynamic material instance
 	PostProcessMID = UMaterialInstanceDynamic::Create(PostProcessMI, this);
 	
-	// this is soooo fucked :D
 	FWeightedBlendable WeightedBlendable;
 	
 	WeightedBlendable.Weight = 1.f;
