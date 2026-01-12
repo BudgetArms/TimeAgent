@@ -39,8 +39,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RespawnEnemies(int LevelNumber);
 
-	void EnableSlowMotion();
-	void DisableSlowMotion();
+	void EnableSlowMotion() const;
+	void DisableSlowMotion() const;
 	
 	
 private:
@@ -53,8 +53,6 @@ private:
 	
 	UPROPERTY()
 	USlowMotionComponent* PlayerSlowMotion{ nullptr };
-	
-	bool bInSlowMotion{ false };
 	
 };
 

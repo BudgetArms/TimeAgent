@@ -23,6 +23,12 @@ public:
 	
 	UMaterialInstanceDynamic* GetSlowMotionPostProcessMaterial() const;
 	
+	UAudioComponent* GetAudioComponent() const;
+	
+	UFUNCTION(BlueprintImplementableEvent, Category="Player|SlowMotion")
+	void PlaySound(USoundBase* SoundBase);
+	
+		
 	
 protected:
 	
@@ -48,28 +54,28 @@ protected:
 	void AddPostProcessingMaterial();
 
 	
-	UPROPERTY(EditAnywhere, Category="Camera", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Player|Camera", meta=(AllowPrivateAccess=true))
 	UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, Category="Input", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Player|Input", meta=(AllowPrivateAccess=true))
 	UInputAction* MoveAction;
 		
-	UPROPERTY(EditAnywhere, Category="Input", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Player|Input", meta=(AllowPrivateAccess=true))
 	UInputAction* LookAction;
 	
-	UPROPERTY(EditAnywhere, Category="Input", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Player|Input", meta=(AllowPrivateAccess=true))
 	UInputAction* JumpAction;
 	
-	UPROPERTY(EditAnywhere, Category="Input", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, Category="Player|Input", meta=(AllowPrivateAccess=true))
 	UInputAction* ShootAction;
 		
 	
 	
-	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	UPROPERTY(EditDefaultsOnly, Category="Player|Effects")
 	UMaterialInstance* PostProcessMI;
 		
+	UPROPERTY()
 	UMaterialInstanceDynamic* PostProcessMID;
-	
 	
 	
 };

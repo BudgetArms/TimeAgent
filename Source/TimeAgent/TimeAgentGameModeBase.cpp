@@ -38,8 +38,7 @@ void ATimeAgentGameModeBase::Tick(float elapsedSec)
 {
 	Super::Tick(elapsedSec);
 	
-	UE_LOG(LogTemp, Log, TEXT("SlowMotion %d"), bInSlowMotion);
-	
+	// UE_LOG(LogTemp, Warning, TEXT("SlowMotion %d"), PlayerSlowMotion->IsInSlowMotion());
 }
 
 bool ATimeAgentGameModeBase::IsInSlowMotion() const
@@ -49,19 +48,16 @@ bool ATimeAgentGameModeBase::IsInSlowMotion() const
 
 void ATimeAgentGameModeBase::ToggleSlowdownTime()
 {
-	if (bInSlowMotion)
+	// const FString Text = PlayerSlowMotion->IsInSlowMotion() ? "OFF" : "ON";
+	// UE_LOG(LogTemp, Warning, TEXT("ToggleSlowdownTime is %s"), *Text); 
+	
+	if (PlayerSlowMotion->IsInSlowMotion())
 	{
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
-		
 		PlayerSlowMotion->StopSlowMotion();
-		bInSlowMotion = false;
 	}
 	else
 	{
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), SlowMotionTimeScale);
-		
 		PlayerSlowMotion->StartSlowMotion();
-		bInSlowMotion = true;;
 	}
 	
 }
@@ -69,13 +65,13 @@ void ATimeAgentGameModeBase::ToggleSlowdownTime()
 
 float ATimeAgentGameModeBase::GetSlowTimeScale() const
 {
-	UE_LOG(LogTemp, Log, TEXT("GetGlobalTimeDilation"));
+	UE_LOG(LogTemp, Verbose, TEXT("GetGlobalTimeDilation"));
 	return SlowMotionTimeScale;
 }
 
 void ATimeAgentGameModeBase::SetSlowTimeScale(float TimeScale)
 {
-	UE_LOG(LogTemp, Log, TEXT("SetGlobalTimeDilation"));
+	UE_LOG(LogTemp, Verbose, TEXT("SetGlobalTimeDilation"));
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeScale);
 }
 
@@ -89,12 +85,12 @@ void ATimeAgentGameModeBase::RespawnEnemies(int LevelNumber)
 	LevelNumber;
 }
 
-void ATimeAgentGameModeBase::EnableSlowMotion()
+void ATimeAgentGameModeBase::EnableSlowMotion() const
 {
-	bInSlowMotion = true;
+	PlayerSlowMotion->StartSlowMotion();
 }
 
-void ATimeAgentGameModeBase::DisableSlowMotion()
+void ATimeAgentGameModeBase::DisableSlowMotion() const
 {
-	bInSlowMotion = false;
+	PlayerSlowMotion->StopSlowMotion();
 }

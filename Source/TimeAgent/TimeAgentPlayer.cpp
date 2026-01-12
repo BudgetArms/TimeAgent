@@ -24,18 +24,17 @@ ATimeAgentPlayer::ATimeAgentPlayer()
 	UCapsuleComponent* Capsule = GetCapsuleComponent();
 	Capsule->SetCapsuleRadius(20);
 	
-		
-		
 	// Set First person type's to capsule/mesh, so the camera doesn't pick up the player
 	Capsule->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
 	GetMesh()->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
 	
+
 }
 
 void ATimeAgentPlayer::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	
+
 	AddPostProcessingMaterial();
 }
 

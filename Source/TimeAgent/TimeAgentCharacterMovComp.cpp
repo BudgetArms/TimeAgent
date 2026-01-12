@@ -8,7 +8,7 @@
 void UTimeAgentCharacterMovComp::TickComponent(float DeltaTime, ELevelTick TickType,
                                                FActorComponentTickFunction* ThisTickFunction)
 {
-	// if not in slowmode, normal
+	// if not in slow motion, normal
 	if (!GetWorld()->GetAuthGameMode<ATimeAgentGameModeBase>()->IsInSlowMotion())
 	{
 		Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

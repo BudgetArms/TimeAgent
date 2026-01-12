@@ -6,6 +6,7 @@
 #include "TimeAgentGameModeBase.h"
 #include "TimeAgentPlayer.h"
 #include "VectorUtil.h"
+#include "Kismet/GameplayStatics.h"
 
 
 USlowMotionComponent::USlowMotionComponent()
@@ -39,15 +40,15 @@ void USlowMotionComponent::BeginPlay()
 
 void USlowMotionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
 	if (!bIsSlowMotionEnabled)
 	{
 		return;	
 	}
 	
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
 	ElapsedSlowDownTime += DeltaTime / GetWorld()->GetAuthGameMode<ATimeAgentGameModeBase>()->GetSlowTimeScale();
-	UE_LOG(LogTemp, Warning, TEXT("%f"), ElapsedSlowDownTime)
+	UE_LOG(LogTemp, Verbose, TEXT("%f"), ElapsedSlowDownTime)
 	
 	if (ElapsedSlowDownTime >= SlowMotionDuration - SlowDownVisuallyFadingTime)
 	{
@@ -67,9 +68,12 @@ void USlowMotionComponent::StartSlowMotion()
 	OpacityOverlay = 100.f;
 	ElapsedSlowDownTime = 0.f;
 	
+	const float TimeScale = GetWorld()->GetAuthGameMode<ATimeAgentGameModeBase>()->GetSlowTimeScale();
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeScale); 
+	
 	MaterialInstanceDynamic->SetScalarParameterValue(OpacityParamName, 1.f);
 	
-	// todo: play begin slowmotion sound
+	GetOwner<ATimeAgentPlayer>()->PlaySound(StartSound);	
 }
 
 void USlowMotionComponent::StopSlowMotion()
@@ -78,9 +82,12 @@ void USlowMotionComponent::StopSlowMotion()
 	OpacityOverlay = 0.f;	
 	ElapsedSlowDownTime = 0.f;
 	
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+	
 	MaterialInstanceDynamic->SetScalarParameterValue(OpacityParamName, 0.f);
 	
-	// todo: play end slowmotion sound
+	GetOwner<ATimeAgentPlayer>()->PlaySound(EndSound);	
+
 }
 
 bool USlowMotionComponent::IsInSlowMotion() const
@@ -90,7 +97,8 @@ bool USlowMotionComponent::IsInSlowMotion() const
 
 void USlowMotionComponent::FadeOverlay()
 {
-	OpacityOverlay = 1.f - 3 *(ElapsedSlowDownTime  - (SlowMotionDuration - SlowDownVisuallyFadingTime)) / (SlowMotionDuration);
+	const float OpacityToRemovePerSecond = 100.f / SlowMotionDuration;
+	OpacityOverlay -= OpacityToRemovePerSecond * GetWorld()->GetDeltaSeconds(); 
 	OpacityOverlay = FMathf::Clamp(OpacityOverlay, 0.f, 1.f);
 	MaterialInstanceDynamic->SetScalarParameterValue(OpacityParamName, OpacityOverlay);
 }

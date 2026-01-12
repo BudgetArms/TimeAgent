@@ -20,7 +20,7 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
-		
+
 	
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -40,7 +40,7 @@ private:
 	float OpacityOverlay{ 100.f };
 	
 	float ElapsedSlowDownTime{ 0.f };
-	float SlowMotionDuration{ 15.f };
+	float SlowMotionDuration{ 8.f };
 	float SlowDownVisuallyFadingTime{ 4.f };
 	
 	
@@ -50,11 +50,18 @@ private:
 	FName OpacityParamName{ TEXT("Opacity") };
 	FName RadiusParamName{ TEXT("Radius") };
 	
-	float DefaultVignetteRadius{  };
-	float CurrentVignetteRadius{  };
+	float DefaultVignetteRadius{};
+	float CurrentVignetteRadius{};
 	
 	UPROPERTY(EditAnywhere, Category="Abilities|SlowMotion")
 	float MaxVignetteRadius{ 10 };
+	
+	
+	UPROPERTY(EditAnywhere, Category="Sounds", meta=(AllowPrivateAccess=true))
+	USoundBase* StartSound{ nullptr };
+	
+	UPROPERTY(EditAnywhere, Category="Sounds", meta=(AllowPrivateAccess=true))
+	USoundBase* EndSound{ nullptr };
 	
 	
 };
