@@ -75,7 +75,6 @@ void USlowMotionComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		return;
 	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("%f"), OpacityOverlay)
 	ElapsedSlowMotionTime += DeltaTime / GetWorld()->GetAuthGameMode<ATimeAgentGameModeBase>()->GetSlowTimeScale();
 	UE_LOG(LogTemp, Verbose, TEXT("%f"), ElapsedSlowMotionTime)
 	
@@ -164,6 +163,7 @@ void USlowMotionComponent::FadeOverlay()
 	OpacityOverlay -= OpacityToRemovePerSecond * GetWorld()->GetDeltaSeconds(); 
 	OpacityOverlay = FMathf::Clamp(OpacityOverlay, 0.f, 1.f);
 	PostProcessMID->SetScalarParameterValue(OpacityParamName, OpacityOverlay);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), OpacityOverlay)
+	
+	UE_LOG(LogTemp, Verbose, TEXT("OpacityOverlay: %f"), OpacityOverlay)
 }
 

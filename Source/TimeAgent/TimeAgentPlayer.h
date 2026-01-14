@@ -7,6 +7,7 @@
 #include "TimeAgentCharacter.h"
 #include "TimeAgentPlayer.generated.h"
 
+class USlowMotionComponent;
 class UCameraComponent;
 /**
  * 
@@ -29,8 +30,19 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category="Player|SlowMotion")
 	void ShowCooldownDoneVfx();
 	
+	UFUNCTION(BlueprintCallable, Category="Player|SlowMotion")
+	FVector GetLookDirection() const;
+		
+	UFUNCTION(BlueprintCallable, Category="Player|SlowMotion", meta=(ToolTip="Get aim direction + sway (if moving)"))
+	FVector GetBulletDirection() const;
+	
+
+	UFUNCTION(BlueprintCallable)
+	void SetSlowMotionComponent(USlowMotionComponent* NewSlowMotionComponent);
 	
 protected:
+	
+	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -53,7 +65,6 @@ protected:
 	
 	void AddPostProcessingMaterial();
 
-	
 	UPROPERTY(EditAnywhere, Category="Player|Camera", meta=(AllowPrivateAccess=true))
 	UCameraComponent* Camera;
 
@@ -76,9 +87,22 @@ protected:
 	UPROPERTY()
 	UMaterialInstanceDynamic* PostProcessMID;
 	
+	UPROPERTY(EditAnywhere, Category="Player|Effects", meta=(AllowPrivateAccess=true))
+	USlowMotionComponent* SlowMotionComp;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Effects", meta=(AllowPrivateAccess=true))
+	
+	UPROPERTY(BlueprintReadWrite, Category="Player|Effects", meta=(AllowPrivateAccess=true))
 	bool bPickedUpGlove{ false };
+		
+	UPROPERTY(EditAnywhere, Category="Player|Effects", meta=(AllowPrivateAccess=true, ToolTip="X movement"))
+	float MovingSway{ 0.2f };
+	
+	UPROPERTY(EditAnywhere, Category="Player|Effects", meta=(AllowPrivateAccess=true, ToolTip="Y movement"))
+	float MovingSurge{ 0.2f };
+	
+	UPROPERTY(EditAnywhere, Category="Player|Effects", meta=(AllowPrivateAccess=true, ToolTip="Z movement"))
+	float MovingHeave{ 0.2f };
+	
 	
 	
 };

@@ -37,6 +37,11 @@ void ATimeAgentGameModeBase::Tick(float elapsedSec)
 
 bool ATimeAgentGameModeBase::IsInSlowMotion() const
 {
+	if (!PlayerSlowMotion)
+	{
+		return false;
+	}
+	
 	return PlayerSlowMotion->IsInSlowMotion();
 }
 
@@ -44,6 +49,11 @@ void ATimeAgentGameModeBase::ToggleSlowdownTime()
 {
 	// const FString Text = PlayerSlowMotion->IsInSlowMotion() ? "OFF" : "ON";
 	// UE_LOG(LogTemp, Warning, TEXT("ToggleSlowdownTime is %s"), *Text); 
+	
+	if (!PlayerSlowMotion)
+	{
+		return;
+	}
 	
 	if (PlayerSlowMotion->IsInSlowMotion())
 	{
@@ -58,6 +68,11 @@ void ATimeAgentGameModeBase::ToggleSlowdownTime()
 
 void ATimeAgentGameModeBase::TryToggleSlowdownTime()
 {
+	if (!PlayerSlowMotion)
+	{
+		return;
+	}
+	
 	if (PlayerSlowMotion->IsInSlowMotion())
 	{
 		PlayerSlowMotion->StopSlowMotion();
@@ -92,11 +107,21 @@ void ATimeAgentGameModeBase::RespawnEnemies(int LevelNumber)
 
 void ATimeAgentGameModeBase::EnableSlowMotion() const
 {
+	if (!PlayerSlowMotion)
+	{
+		return;
+	}
+	
 	PlayerSlowMotion->StartSlowMotion();
 }
 
 void ATimeAgentGameModeBase::DisableSlowMotion() const
 {
+	if (!PlayerSlowMotion)
+	{
+		return;
+	}
+	
 	PlayerSlowMotion->StopSlowMotion();
 }
 

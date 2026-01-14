@@ -9,7 +9,7 @@
 
 class UCameraComponent;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TIMEAGENT_API USlowMotionComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -47,11 +47,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category="SlowMotion")
 	void Enable();
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="SlowMotion")
+	float VignetteRadius{ 0.6f };
+	
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SlowMotion")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="SlowMotion")
+	int32 TestedPlay{ 66 };
+	
 	
 private:
 
 	void FadeOverlay();
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="SlowMotion", meta=(AllowPrivateAccess=true))
 	bool bIsInfinite{ false };
 	bool bIsEnabled{ false };
 	bool bIsActive{ false };
@@ -61,10 +69,10 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="SlowMotion")
 	float StartOpacityOverlay{ 0.76f };
-		
-	UPROPERTY(EditAnywhere, Category="SlowMotion")
-	float VignetteRadius{ 0.6f };
-	
+	// 	
+	// UPROPERTY(EditAnywhere, Category="SlowMotion")
+	// float VignetteRadius{ 0.6f };
+	//
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="SlowMotion", meta=(AllowPrivateAccess=true))
 	float ElapsedSlowMotionTime{ 0.f };
 	
