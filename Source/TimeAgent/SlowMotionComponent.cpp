@@ -18,43 +18,72 @@ USlowMotionComponent::USlowMotionComponent()
 void USlowMotionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	const AActor* Owner = GetOwner();
-	if (!Owner)
+
+	if (const AActor* Owner = GetOwner(); !Owner)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Owner not found"));
 		return;
 	}
 	
-	MaterialInstanceDynamic = Cast<ATimeAgentPlayer>(GetOwner())->GetSlowMotionPostProcessMaterial();
-	if (!MaterialInstanceDynamic)
+	PostProcessMID = Cast<ATimeAgentPlayer>(GetOwner())->GetSlowMotionPostProcessMaterial();
+	if (!PostProcessMID)
 	{
 		UE_LOG(LogTemp, Error, TEXT("SlowMotionComponent: MaterialInstanceDynamic not found"));
 		return;
 	}
+		
+	PostProcessMID->SetScalarParameterValue(RadiusParamName, VignetteRadius);
+	PostProcessMID->SetScalarParameterValue(OpacityParamName, 0.f);
 	
-	MaterialInstanceDynamic->GetScalarParameterValue(RadiusParamName, DefaultVignetteRadius);
+	if (!StartSound)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SlowMotionComponent: StartSound not found"));
+		return;
+	}
+	if (!EndSound)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SlowMotionComponent: EndSound not found"));
+		return;
+	}
 	
-	StopSlowMotion();
+	StopSlowMotion(false);
 }
 
 void USlowMotionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	if (!bIsSlowMotionEnabled)
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (bIsInfinite || !bIsEnabled)
 	{
 		return;	
 	}
 	
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (bIsCoolDownActive)
+	{
+		ElapsedCooldownTime += DeltaTime;
+		
+		if (ElapsedCooldownTime >= Duration)
+		{
+			bIsCoolDownActive = false;
+			ElapsedCooldownTime = 0.f;
+			GetOwner<ATimeAgentPlayer>()->ShowCooldownDoneVfx();
+		}
+	}
 	
-	ElapsedSlowDownTime += DeltaTime / GetWorld()->GetAuthGameMode<ATimeAgentGameModeBase>()->GetSlowTimeScale();
-	UE_LOG(LogTemp, Verbose, TEXT("%f"), ElapsedSlowDownTime)
+	if (!bIsActive)
+	{
+		return;
+	}
 	
-	if (ElapsedSlowDownTime >= SlowMotionDuration - SlowDownVisuallyFadingTime)
+	UE_LOG(LogTemp, Warning, TEXT("%f"), OpacityOverlay)
+	ElapsedSlowMotionTime += DeltaTime / GetWorld()->GetAuthGameMode<ATimeAgentGameModeBase>()->GetSlowTimeScale();
+	UE_LOG(LogTemp, Verbose, TEXT("%f"), ElapsedSlowMotionTime)
+	
+	if (ElapsedSlowMotionTime >= Duration - VisuallyFadingTime)
 	{
 		FadeOverlay();
 		
-		if (ElapsedSlowDownTime >= SlowMotionDuration)
+		if (ElapsedSlowMotionTime >= Duration)
 		{
 			StopSlowMotion();
 		}
@@ -62,44 +91,79 @@ void USlowMotionComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 }
 
-void USlowMotionComponent::StartSlowMotion()
+void USlowMotionComponent::TryActiveSlowMotion()
 {
-	bIsSlowMotionEnabled = true;
-	OpacityOverlay = 100.f;
-	ElapsedSlowDownTime = 0.f;
+	if (bIsCoolDownActive || !bIsEnabled)
+	{
+		return;	
+	}
+	
+	StartSlowMotion();
+}
+
+void USlowMotionComponent::StartSlowMotion(bool bIsInfiniteSlowMotion)
+{
+	bIsInfinite = bIsInfiniteSlowMotion;	
+	bIsEnabled = true;
+	bIsActive = true;
+	OpacityOverlay = StartOpacityOverlay;
+	ElapsedCooldownTime = 0.f;
+	ElapsedSlowMotionTime = 0.f;
 	
 	const float TimeScale = GetWorld()->GetAuthGameMode<ATimeAgentGameModeBase>()->GetSlowTimeScale();
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeScale); 
 	
-	MaterialInstanceDynamic->SetScalarParameterValue(OpacityParamName, 1.f);
+	PostProcessMID->SetScalarParameterValue(OpacityParamName, StartOpacityOverlay);
 	
 	GetOwner<ATimeAgentPlayer>()->PlaySound(StartSound);	
 }
 
-void USlowMotionComponent::StopSlowMotion()
+void USlowMotionComponent::StopSlowMotion(bool bPlaySound)
 {
-	bIsSlowMotionEnabled = false;
+	bIsCoolDownActive = true;
+	bIsActive = false;
+	bIsInfinite = false;
 	OpacityOverlay = 0.f;	
-	ElapsedSlowDownTime = 0.f;
+	ElapsedCooldownTime = 0.f;
+	ElapsedSlowMotionTime = 0.f;
 	
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 	
-	MaterialInstanceDynamic->SetScalarParameterValue(OpacityParamName, 0.f);
+	PostProcessMID->SetScalarParameterValue(OpacityParamName, 0.f);
 	
-	GetOwner<ATimeAgentPlayer>()->PlaySound(EndSound);	
+	if(bPlaySound)
+	{
+		GetOwner<ATimeAgentPlayer>()->PlaySound(EndSound);	
+	}
 
 }
 
 bool USlowMotionComponent::IsInSlowMotion() const
 {
-	return bIsSlowMotionEnabled;
+	return bIsEnabled && bIsActive;
+}
+
+bool USlowMotionComponent::IsInCooldown() const
+{
+	return bIsCoolDownActive;
+}
+
+bool USlowMotionComponent::IsEnabled() const
+{
+	return bIsEnabled;
+}
+
+void USlowMotionComponent::Enable()
+{
+	bIsEnabled = true;
 }
 
 void USlowMotionComponent::FadeOverlay()
 {
-	const float OpacityToRemovePerSecond = 100.f / SlowMotionDuration;
+	const float OpacityToRemovePerSecond = 7.f / Duration;
 	OpacityOverlay -= OpacityToRemovePerSecond * GetWorld()->GetDeltaSeconds(); 
 	OpacityOverlay = FMathf::Clamp(OpacityOverlay, 0.f, 1.f);
-	MaterialInstanceDynamic->SetScalarParameterValue(OpacityParamName, OpacityOverlay);
+	PostProcessMID->SetScalarParameterValue(OpacityParamName, OpacityOverlay);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), OpacityOverlay)
 }
 

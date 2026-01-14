@@ -23,4 +23,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category="Input", meta=(AllowPrivateAccess=true))
 	TArray<UInputMappingContext*> InputMappingContexts;
+	
+	
 };
+

@@ -23,12 +23,12 @@ public:
 	
 	UMaterialInstanceDynamic* GetSlowMotionPostProcessMaterial() const;
 	
-	UAudioComponent* GetAudioComponent() const;
-	
 	UFUNCTION(BlueprintImplementableEvent, Category="Player|SlowMotion")
 	void PlaySound(USoundBase* SoundBase);
 	
-		
+	UFUNCTION(BlueprintImplementableEvent, Category="Player|SlowMotion")
+	void ShowCooldownDoneVfx();
+	
 	
 protected:
 	
@@ -69,13 +69,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Player|Input", meta=(AllowPrivateAccess=true))
 	UInputAction* ShootAction;
 		
-	
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Player|Effects")
 	UMaterialInstance* PostProcessMI;
 		
 	UPROPERTY()
 	UMaterialInstanceDynamic* PostProcessMID;
+	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Effects", meta=(AllowPrivateAccess=true))
+	bool bPickedUpGlove{ false };
 	
 	
 };

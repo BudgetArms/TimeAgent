@@ -8,12 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 
 
-ATimeAgentGameModeBase::ATimeAgentGameModeBase()
-{
-	
-}
-
-
 void ATimeAgentGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -62,6 +56,18 @@ void ATimeAgentGameModeBase::ToggleSlowdownTime()
 	
 }
 
+void ATimeAgentGameModeBase::TryToggleSlowdownTime()
+{
+	if (PlayerSlowMotion->IsInSlowMotion())
+	{
+		PlayerSlowMotion->StopSlowMotion();
+	}
+	else
+	{
+		PlayerSlowMotion->TryActiveSlowMotion();
+	}
+	
+}
 
 float ATimeAgentGameModeBase::GetSlowTimeScale() const
 {
@@ -79,7 +85,6 @@ void ATimeAgentGameModeBase::RespawnPlayer()
 {
 }
 
-
 void ATimeAgentGameModeBase::RespawnEnemies(int LevelNumber)
 {
 	LevelNumber;
@@ -94,3 +99,4 @@ void ATimeAgentGameModeBase::DisableSlowMotion() const
 {
 	PlayerSlowMotion->StopSlowMotion();
 }
+

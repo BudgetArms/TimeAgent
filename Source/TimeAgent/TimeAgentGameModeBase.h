@@ -17,7 +17,6 @@ class TIMEAGENT_API ATimeAgentGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	ATimeAgentGameModeBase();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float elapsedSec) override;
@@ -26,6 +25,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ToggleSlowdownTime();
+	
+	UFUNCTION(BlueprintCallable)
+	void TryToggleSlowdownTime();
 
 	UFUNCTION(BlueprintCallable)
 	float GetSlowTimeScale() const;
@@ -39,20 +41,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RespawnEnemies(int LevelNumber);
 
-	void EnableSlowMotion() const;
+	void EnableSlowMotion()	const;
 	void DisableSlowMotion() const;
 	
 	
 private:
 
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true), EditAnywhere)
-	float SlowMotionTimeScale{ 0.01f };
+	float SlowMotionTimeScale{ 0.1f };
 
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	ATimeAgentPlayer* Player{ nullptr };
 	
 	UPROPERTY()
 	USlowMotionComponent* PlayerSlowMotion{ nullptr };
+	
 	
 };
 
