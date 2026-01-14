@@ -35,7 +35,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSlowTimeScale(float TimeScale);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void RespawnPlayer();
 	
 	UFUNCTION(BlueprintCallable)

@@ -6,6 +6,7 @@
 #include "SlowMotionComponent.h"
 #include "TimeAgentPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "UniversalObjectLocators/UniversalObjectLocatorUtils.h"
 
 
 void ATimeAgentGameModeBase::BeginPlay()
@@ -96,9 +97,6 @@ void ATimeAgentGameModeBase::SetSlowTimeScale(float TimeScale)
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeScale);
 }
 
-void ATimeAgentGameModeBase::RespawnPlayer()
-{
-}
 
 void ATimeAgentGameModeBase::RespawnEnemies(int LevelNumber)
 {
