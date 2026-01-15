@@ -73,8 +73,7 @@ FVector ATimeAgentPlayer::GetBulletDirection() const
 	}
 	
 	// if standing still
-	if (!GetCharacterMovement()->IsMovingOnGround() && !GetCharacterMovement()->IsFalling() 
-		&& GetCharacterMovement()->Velocity.Length() == 0)
+	if (GetCharacterMovement()->Velocity.Length() == 0)
 	{
 		return LookDirection;
 	}

@@ -97,12 +97,6 @@ void ATimeAgentGameModeBase::SetSlowTimeScale(float TimeScale)
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeScale);
 }
 
-
-void ATimeAgentGameModeBase::RespawnEnemies(int LevelNumber)
-{
-	LevelNumber;
-}
-
 void ATimeAgentGameModeBase::EnableSlowMotion() const
 {
 	if (!PlayerSlowMotion)

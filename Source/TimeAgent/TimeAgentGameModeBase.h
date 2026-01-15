@@ -38,9 +38,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void RespawnPlayer();
 	
-	UFUNCTION(BlueprintCallable)
-	void RespawnEnemies(int LevelNumber);
-
 	void EnableSlowMotion()	const;
 	void DisableSlowMotion() const;
 	
